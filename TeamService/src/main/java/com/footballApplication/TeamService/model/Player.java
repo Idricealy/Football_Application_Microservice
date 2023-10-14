@@ -1,4 +1,4 @@
-package com.footballApplication.PlayerService.model;
+package com.footballApplication.TeamService.model;
 
 public class Player {
     private String name;
