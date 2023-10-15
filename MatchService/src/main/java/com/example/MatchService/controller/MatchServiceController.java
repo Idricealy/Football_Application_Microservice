@@ -28,6 +28,7 @@ public class MatchServiceController {
 
         if (!isInit) {
             List<Team> teams = teamServiceDelegate.getAllTeams();
+            Random random = new Random();
 
             for (Team team1 : teams) {
                 for (Team team2 : teams) {
@@ -40,9 +41,21 @@ public class MatchServiceController {
                         match.setDate(new Date());
                         match.setSeason(year);
 
-                        Random random = new Random();
-
                         match.setGoals(new ArrayList<>());
+
+                        int team1Goals = random.nextInt(6);
+                        int team2Goals = random.nextInt(6);
+
+                        for (int i = 0; i < team1Goals; i++) {
+                            Goal goal = new Goal(team1.getRandomPlayerId(), team1.getTeamId());
+                            match.getGoals().add(goal);
+                        }
+
+                        for (int i = 0; i < team2Goals; i++) {
+                            Goal goal = new Goal(team2.getRandomPlayerId(), team2.getTeamId());
+                            match.getGoals().add(goal);
+                        }
+
                         List<Match> matches = matchDB.computeIfAbsent(year, k -> new ArrayList<>());
                         matches.add(match);
                     }
@@ -51,6 +64,7 @@ public class MatchServiceController {
             isInit = true;
         }
     }
+
 
     @PostMapping
     public ResponseEntity<Match> createMatch(@RequestBody Match match) {
@@ -97,6 +111,33 @@ public class MatchServiceController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/season/{season}")
+    public ResponseEntity<List<Match>> getMatchesBySeason(@PathVariable int season) {
+        if (matchDB.containsKey(season)) {
+            List<Match> matchesForSeason = matchDB.get(season);
+            return ResponseEntity.ok(matchesForSeason);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/season/{season}/team/{teamId}")
+    public ResponseEntity<List<Match>> getMatchesBySeasonAndTeam(@PathVariable int season, @PathVariable int teamId) {
+        List<Match> matchesForSeasonAndTeam = new ArrayList<>();
+
+        for (Match match : matchDB.getOrDefault(season, new ArrayList<>())) {
+            if (match.getTeam1().getTeamId() == teamId || match.getTeam2().getTeamId() == teamId) {
+                matchesForSeasonAndTeam.add(match);
+            }
+        }
+
+        if (!matchesForSeasonAndTeam.isEmpty()) {
+            return ResponseEntity.ok(matchesForSeasonAndTeam);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/{matchId}/goal")

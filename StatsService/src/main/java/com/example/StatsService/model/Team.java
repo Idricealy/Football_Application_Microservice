@@ -1,4 +1,4 @@
-package com.example.MatchService.model;
+package com.example.StatsService.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,16 +37,6 @@ public class Team {
 
     public List<Player> getPlayers() {
         return players;
-    }
-
-    public int getRandomPlayerId() {
-        if (players != null && !players.isEmpty()) {
-            Random random = new Random();
-            int randomIndex = random.nextInt(players.size());
-            Player randomPlayer = players.get(randomIndex);
-            return randomPlayer.getPlayerId();
-        }
-        return -1;
     }
 
 }
