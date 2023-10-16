@@ -4,6 +4,10 @@ import com.example.MatchService.delegate.TeamServiceDelegate;
 import com.example.MatchService.model.Goal;
 import com.example.MatchService.model.Match;
 import com.example.MatchService.model.Team;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +15,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Api(value = "MatchServiceController", description = "REST Apis related to Match Entity.")
+@ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Suceess|OK"),
+        @ApiResponse(code = 401, message = "Not authorized."),
+        @ApiResponse(code = 403, message = "Forbidden."),
+        @ApiResponse(code = 404, message = "not Found.") })
 @RestController
 @RequestMapping("/matches")
 public class MatchServiceController {
@@ -23,6 +33,7 @@ public class MatchServiceController {
     TeamServiceDelegate teamServiceDelegate;
 
     @PostMapping("/initMatches")
+    @ApiOperation(value = "Init list of matches", tags = "initMatches")
     public void initMatches() {
         int year = 2023;
 
@@ -67,6 +78,7 @@ public class MatchServiceController {
 
 
     @PostMapping
+    @ApiOperation(value = "Create match entity", response = Match.class, tags = "postMatch")
     public ResponseEntity<Match> createMatch(@RequestBody Match match) {
         int season = match.getSeason();
         List<Match> matches = matchDB.get(season);
@@ -91,6 +103,7 @@ public class MatchServiceController {
     }
 
     @GetMapping("/{matchId}")
+    @ApiOperation(value = "Get match entity", response = Match.class, tags = "getMatch")
     public ResponseEntity<Match> getMatch(@PathVariable int matchId) {
         for (List<Match> matches : matchDB.values()) {
             Optional<Match> match = matches.stream()
@@ -114,6 +127,7 @@ public class MatchServiceController {
     }
 
     @GetMapping("/season/{season}")
+    @ApiOperation(value = "Get match by season", response = Match.class, tags = "getMatchBySeason")
     public ResponseEntity<List<Match>> getMatchesBySeason(@PathVariable int season) {
         if (matchDB.containsKey(season)) {
             List<Match> matchesForSeason = matchDB.get(season);
@@ -124,6 +138,7 @@ public class MatchServiceController {
     }
 
     @GetMapping("/season/{season}/team/{teamId}")
+    @ApiOperation(value = "Get match by season and team", response = Match.class, tags = "getMatchBySeasonAndTeam")
     public ResponseEntity<List<Match>> getMatchesBySeasonAndTeam(@PathVariable int season, @PathVariable int teamId) {
         List<Match> matchesForSeasonAndTeam = new ArrayList<>();
 
@@ -141,6 +156,7 @@ public class MatchServiceController {
     }
 
     @PostMapping("/{matchId}/goal")
+    @ApiOperation(value = "Create goal", response = Match.class, tags = "postGoal")
     public ResponseEntity<Goal> createGoal(@PathVariable int matchId, @RequestBody Goal goal) {
         for (List<Match> matches : matchDB.values()) {
             Optional<Match> result = matches.stream()
@@ -159,11 +175,13 @@ public class MatchServiceController {
         return ResponseEntity.notFound().build();
     }
     @GetMapping
+    @ApiOperation(value = "Get all matches", tags = "getAllMatches")
     public ResponseEntity<Map<Integer, List<Match>>> getMatches() {
         return ResponseEntity.ok(matchDB);
     }
 
     @PutMapping("/{matchId}")
+    @ApiOperation(value = "Update match",tags = "UpdateMatch")
     public ResponseEntity<Match> updateMatch(@PathVariable int matchId, @RequestBody Match updatedMatch) {
         for (List<Match> matches : matchDB.values()) {
             Optional<Match> result = matches.stream()
@@ -181,6 +199,7 @@ public class MatchServiceController {
     }
 
     @DeleteMapping("/{matchId}")
+    @ApiOperation(value = "Delete match", tags = "deleteMatch")
     public ResponseEntity<Void> deleteMatch(@PathVariable int matchId) {
         for (List<Match> matches : matchDB.values()) {
             Optional<Match> result = matches.stream()

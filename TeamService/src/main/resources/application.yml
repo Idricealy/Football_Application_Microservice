@@ -15,5 +15,9 @@ spring:
     name: team-service
 
 management:
-  security:
-    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "info,hystrix.stream,logfile,prometheus,loggers,metrics"
+      security:
+        enabled: false

@@ -1,5 +1,6 @@
 server:
   port: 9002
+
 eureka:
   instance:
     leaseRenewalIntervalInSeconds: 5
@@ -17,5 +18,17 @@ spring:
     name: player-service
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,env,metrics,prometheus"
+  endpoint:
+    health:
+      show-details: ALWAYS
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
   security:
     enabled: false

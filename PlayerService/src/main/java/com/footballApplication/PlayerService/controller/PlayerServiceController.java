@@ -1,12 +1,22 @@
 package com.footballApplication.PlayerService.controller;
 
 import com.footballApplication.PlayerService.model.Player;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+@Api(value = "PlayerServiceController", description = "REST Apis related to Player Entity.")
+@ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Suceess|OK"),
+        @ApiResponse(code = 401, message = "Not authorized."),
+        @ApiResponse(code = 403, message = "Forbidden."),
+        @ApiResponse(code = 404, message = "not Found.") })
 @RestController
 @RequestMapping("/players")
 public class PlayerServiceController {
@@ -98,11 +108,13 @@ public class PlayerServiceController {
         teamPlayer.add(newPlayer40);
     }
 
+    @ApiOperation(value = "Get list of players", response = Player.class, tags = "getPlayers")
     @GetMapping
     public ResponseEntity<List<Player>> getPlayers() {
         return ResponseEntity.ok(teamPlayer);
     }
 
+    @ApiOperation(value = "Get player by id", response = Player.class, tags = "getPlayersById")
     @GetMapping("/{playerId}")
     public ResponseEntity<Player> getPlayer(@PathVariable int playerId) {
         Player player = findPlayerById(playerId);
@@ -113,6 +125,7 @@ public class PlayerServiceController {
         }
     }
 
+    @ApiOperation(value = "Get player by team id", response = Player.class, tags = "getPlayersByTeamId")
     @GetMapping("/team/{teamId}/players")
     public ResponseEntity<List<Player>> getPlayersByTeamId(@PathVariable int teamId) {
         List<Player> playersInTeam = new ArrayList<>();
@@ -132,6 +145,7 @@ public class PlayerServiceController {
 
 
     @PostMapping
+    @ApiOperation(value = "Create player by id", response = Player.class, tags = "postPlayer")
     public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
         if (player.getPlayerId() == 0) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
@@ -141,6 +155,7 @@ public class PlayerServiceController {
     }
 
     @PutMapping("/{playerId}")
+    @ApiOperation(value = "Update player by id", response = Player.class, tags = "updatePlayer")
     public ResponseEntity<Player> updatePlayer(@PathVariable int playerId, @RequestBody Player updatedPlayer) {
         System.out.println(updatedPlayer.getPlayerId());
         Player existingPlayer = findPlayerById(playerId);
@@ -160,6 +175,7 @@ public class PlayerServiceController {
     }
 
     @DeleteMapping("/{playerId}")
+    @ApiOperation(value = "Delete player by id", response = Player.class, tags = "deletePlayer")
     public ResponseEntity<Void> deletePlayer(@PathVariable int playerId) {
         Player player = findPlayerById(playerId);
         if (player != null) {

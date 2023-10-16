@@ -4,6 +4,7 @@ import com.example.MatchService.model.Match;
 import com.example.MatchService.model.Team;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -21,7 +22,7 @@ public class TeamServiceDelegate {
     @Autowired
     RestTemplate restTemplate;
 
-    String teamServiceUrl = "http://localhost:9001/teams";
+    String teamServiceUrl = "http://team-service/teams";
 
     private List<Team> getAllTeams_Fallback() {
         System.out.println("CIRCUIT BREAKER ! TeamService is down, the service will be enabled soon... - " + new Date());
@@ -60,6 +61,7 @@ public class TeamServiceDelegate {
         return responseEntity.getBody();
     }
 
+    @LoadBalanced
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();

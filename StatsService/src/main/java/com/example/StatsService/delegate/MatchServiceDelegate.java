@@ -3,6 +3,7 @@ package com.example.StatsService.delegate;
 import com.example.StatsService.model.Match;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -20,7 +21,7 @@ public class MatchServiceDelegate {
     @Autowired
     RestTemplate restTemplate;
 
-    String matchesServiceUrl = "http://localhost:9003/matches";
+    String matchesServiceUrl = "http://match-service/matches";
 
     public List<Match> getMatchBySeasonAndTeam_Fallback(int season, int teamId) {
         System.out.println("CIRCUIT BREAKER ! MatchService is down or data was not initialized, the service will be avaiable soon... - " + new Date());
@@ -56,6 +57,7 @@ public class MatchServiceDelegate {
         return responseEntity.getBody();
     }
 
+    @LoadBalanced
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();

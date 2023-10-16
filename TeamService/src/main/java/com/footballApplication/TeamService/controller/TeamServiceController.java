@@ -2,6 +2,10 @@ package com.footballApplication.TeamService.controller;
 
 import com.footballApplication.TeamService.delegate.PlayerServiceDelegate;
 import com.footballApplication.TeamService.model.Team;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Api(value = "TeamServiceController", description = "REST Apis related to Team Entity.")
+@ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Suceess|OK"),
+        @ApiResponse(code = 401, message = "Not authorized."),
+        @ApiResponse(code = 403, message = "Forbidden."),
+        @ApiResponse(code = 404, message = "not Found.") })
 @RestController
 @RequestMapping("/teams")
 public class TeamServiceController {
@@ -35,10 +45,8 @@ public class TeamServiceController {
         teamDB.add(newTeam4);
     }
 
-    /**
-     * This method is called before each get call.
-     */
     @PostMapping("/addPlayersOnTeams")
+    @ApiOperation(value = "Init list of teams", tags = "initTeams")
     public void initTeamsWithPlayers() {
         if(!isInit) {
             List<Player> players = playerService.getAllPlayersFromPlayerService();
@@ -58,6 +66,7 @@ public class TeamServiceController {
     }
 
     @PostMapping
+    @ApiOperation(value = "Create new team", tags = "postTeam")
     public ResponseEntity<Team> postTeam(@RequestBody Team team) {
         if (team.getTeamId() == 0) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
@@ -67,6 +76,7 @@ public class TeamServiceController {
     }
 
     @GetMapping("/{teamId}")
+    @ApiOperation(value = "Get team by id", tags = "getTeam")
     public ResponseEntity<Team> getTeam(@PathVariable int teamId) {
         Optional<Team> result = teamDB.stream()
                 .filter(team -> team.getTeamId() == teamId)
@@ -78,6 +88,7 @@ public class TeamServiceController {
         }
     }
     @GetMapping
+    @ApiOperation(value = "Get all teams", tags = "getAllTeams")
     public ResponseEntity<List<Team>> getTeams() {
         for (Team team : teamDB) {
             List<Player> playersInTeam = playerService.getPlayersByTeam(team.getTeamId());
@@ -87,6 +98,7 @@ public class TeamServiceController {
     }
 
     @PutMapping("/{teamId}")
+    @ApiOperation(value = "Update team", tags = "updateTeam")
     public ResponseEntity<Team> updateTeam(@PathVariable int teamId, @RequestBody Team updatedTeam) {
         Optional<Team> result = teamDB.stream()
                 .filter(team -> team.getTeamId() == teamId && teamId != 0)
@@ -101,6 +113,7 @@ public class TeamServiceController {
     }
 
     @DeleteMapping("/{teamId}")
+    @ApiOperation(value = "delete Team", tags = "deleteTeam")
     public ResponseEntity<Void> deleteTeam(@PathVariable int teamId) {
         Optional<Team> result = teamDB.stream()
                 .filter(team -> team.getTeamId() == teamId)
@@ -114,6 +127,7 @@ public class TeamServiceController {
     }
 
     @GetMapping("/{teamId}/players")
+    @ApiOperation(value = "Get players by team", tags = "getPlayersByTeam")
     public ResponseEntity<List<Player>> getPlayersByTeam(@PathVariable int teamId) {
         Optional<Team> result = teamDB.stream()
                 .filter(team -> team.getTeamId() == teamId)

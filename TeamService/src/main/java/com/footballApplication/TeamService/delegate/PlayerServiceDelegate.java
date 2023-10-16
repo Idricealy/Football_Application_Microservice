@@ -3,6 +3,7 @@ package com.footballApplication.TeamService.delegate;
 import com.footballApplication.TeamService.model.Player;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -21,7 +22,7 @@ public class PlayerServiceDelegate {
     @Autowired
     RestTemplate restTemplate;
 
-    String playerServiceUrl = "http://localhost:9002/players";
+    String playerServiceUrl = "http://player-service/players";
 
     private List<Player> getPlayersByTeam_Fallback(int teamId) {
         System.out.println("CIRCUIT BREAKER ! PlayerService is down, the service will be enabled soon... - " + new Date());
@@ -77,6 +78,7 @@ public class PlayerServiceDelegate {
                 });
     }
 
+    @LoadBalanced
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
